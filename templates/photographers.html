@@ -305,148 +305,132 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Our Elite Photographers</h1>
-            <p>Meet our award-winning team of professional photographers, each with unique expertise to capture your perfect moments</p>
-            <div class="divider"></div>
-            
-            <div class="filter-bar">
-                <button class="filter-btn active">All</button>
-                <button class="filter-btn">Wedding</button>
-                <button class="filter-btn">Portrait</button>
-             
-                <button class="filter-btn">Fashion</button>
-                <button class="filter-btn">Event</button>
-            </div>
-        </header>
+  <div class="container">
+    <header>
+      <h1>Our Elite Photographers</h1>
+      <p>Meet our award-winning team of professional photographers, each with unique expertise to capture your perfect moments</p>
+      <div class="divider"></div>
 
-        <div class="grid">
-            {% for p in photographers %}
-            <div class="card" data-skills="{{ p.skills | join(' ') }}">
-                {% if p.featured %}
-                <div class="card-badge">Featured</div>
-                {% endif %}
-                
-                <img src="{{ url_for('static', filename='images/' + p.image) }}" alt="{{ p.name }}" class="card-img">
-                
-                <div class="card-content">
-                    <h3 class="photographer-name">{{ p.name }}</h3>
-                    
-                    <div class="photographer-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        {{ p.location }}
-                    </div>
-                    
-                    <div class="photographer-skills">
-                        {% for skill in p.skills %}
-                        <span class="skill-tag">{{ skill }}</span>
-                        {% endfor %}
-                    </div>
-                    
-                    <div class="photographer-info">
-                        <div class="info-item">
-                            <div class="info-label">Experience</div>
-                            <div class="info-value">{{ p.experience }} years</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Price</div>
-                            <div class="info-value">{{ p.price }}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Shoots</div>
-                            <div class="info-value">250+</div>
-                        </div>
-                    </div>
-                    
-                    <div class="rating">
-                        <div class="stars">
-                            {% for i in range(p.rating|int) %}
-                            <i class="fas fa-star"></i>
-                            {% endfor %}
-                            {% if p.rating - p.rating|int > 0 %}
-                            <i class="fas fa-star-half-alt"></i>
-                            {% endif %}
-                        </div>
-                        <div class="rating-value">{{ p.rating }}/5</div>
-                    </div>
-                    
-                    <div class="availability">
-                        {% for day in availability_data[p.id] %}
-                        <span class="availability-tag">{{ day }}</span>
-                        {% endfor %}
-                    </div>
-                    
-                    <a href="{{ url_for('book', photographer_id=p.id) }}" class="btn">Book Now</a>
-                </div>
-            </div>
+      <div class="filter-bar">
+        <button class="filter-btn active">All</button>
+        <button class="filter-btn">Wedding</button>
+        <button class="filter-btn">Portrait</button>
+        <button class="filter-btn">Fashion</button>
+        <button class="filter-btn">Event</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      {% for p in photographers %}
+      <div class="card" data-skills="{{ p.skills | join(' ') }}">
+        {% if p.get('featured') %}
+        <div class="card-badge">Featured</div>
+        {% endif %}
+
+        <img src="{{ p['Image'] }}" alt="{{ p['Name'] }}" class="card-img">
+
+        <div class="card-content">
+          <h3 class="photographer-name">{{ p['Name'] }}</h3>
+
+          <div class="photographer-location">
+            <i class="fas fa-map-marker-alt"></i>
+            {{ p.get('Location', 'India') }}
+          </div>
+
+          <div class="photographer-skills">
+            {% for skill in p.skills %}
+            <span class="skill-tag">{{ skill }}</span>
             {% endfor %}
-        </div>
+          </div>
 
-        <a href="/" class="back-btn">
-            <i class="fas fa-arrow-left"></i>
-            Back to Home
-        </a>
+          <div class="photographer-info">
+            <div class="info-item">
+              <div class="info-label">Experience</div>
+              <div class="info-value">{{ p.get('Experience', '2') }} years</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Price</div>
+              <div class="info-value">{{ p['Price'] }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Shoots</div>
+              <div class="info-value">250+</div>
+            </div>
+          </div>
+
+          <div class="rating">
+            <div class="stars">
+              {% for i in range(p.rating | int) %}
+              <i class="fas fa-star"></i>
+              {% endfor %}
+              {% if p.rating - (p.rating | int) > 0 %}
+              <i class="fas fa-star-half-alt"></i>
+              {% endif %}
+            </div>
+            <div class="rating-value">{{ p.rating }}/5</div>
+          </div>
+
+          <div class="availability">
+            {% for day in availability_data[p['photographer_id']] %}
+            <span class="availability-tag">{{ day }}</span>
+            {% endfor %}
+          </div>
+
+          <a href="{{ url_for('book', photographer_id=p['photographer_id']) }}" class="btn">Book Now</a>
+        </div>
+      </div>
+      {% endfor %}
     </div>
 
-    <script>
-        // Filter functionality
-        const filterBtns = document.querySelectorAll('.filter-btn');
-        const cards = document.querySelectorAll('.card');
-        
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                // Update active button
-                filterBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                const filterValue = btn.textContent.toLowerCase();
-                
-                // Filter cards
-                cards.forEach(card => {
-                    if (filterValue === 'all') {
-                        card.style.display = 'block';
-                    } else {
-                        const skills = card.dataset.skills.toLowerCase();
-                        if (skills.includes(filterValue)) {
-                            card.style.display = 'block';
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    }
-                });
-            });
+    <a href="/" class="back-btn">
+      <i class="fas fa-arrow-left"></i>
+      Back to Home
+    </a>
+  </div>
+
+  <script>
+    // Filter functionality
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const cards = document.querySelectorAll('.card');
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const filterValue = btn.textContent.toLowerCase();
+        cards.forEach(card => {
+          const skills = card.dataset.skills.toLowerCase();
+          card.style.display = (filterValue === 'all' || skills.includes(filterValue)) ? 'block' : 'none';
         });
-        
-        // Animation on scroll
-        const animateOnScroll = () => {
-            const cards = document.querySelectorAll('.card');
-            
-            cards.forEach((card, index) => {
-                const cardPosition = card.getBoundingClientRect().top;
-                const screenPosition = window.innerHeight / 1.3;
-                
-                if (cardPosition < screenPosition) {
-                    card.style.transitionDelay = `${index * 0.1}s`;
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }
-            });
-        };
-        
-        // Set initial state for animation
-        window.addEventListener('load', () => {
-            const cards = document.querySelectorAll('.card');
-            cards.forEach(card => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                card.style.transition = 'all 0.5s ease';
-            });
-            
-            animateOnScroll();
-        });
-        
-        window.addEventListener('scroll', animateOnScroll);
-    </script>
+      });
+    });
+
+    // Animation on scroll
+    const animateOnScroll = () => {
+      const cards = document.querySelectorAll('.card');
+      cards.forEach((card, index) => {
+        const cardPosition = card.getBoundingClientRect().top;
+        const screenPosition = window.innerHeight / 1.3;
+        if (cardPosition < screenPosition) {
+          card.style.transitionDelay = `${index * 0.1}s`;
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }
+      });
+    };
+
+    window.addEventListener('load', () => {
+      const cards = document.querySelectorAll('.card');
+      cards.forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'all 0.5s ease';
+      });
+      animateOnScroll();
+    });
+
+    window.addEventListener('scroll', animateOnScroll);
+  </script>
 </body>
 </html>
