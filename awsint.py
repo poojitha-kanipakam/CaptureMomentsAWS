@@ -8,7 +8,7 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # For flash messages
 
 # Step 2: Connect to AWS DynamoDB
-dynamodb = boto3.resource('dynamodb', region_name='ap-south-1')
+dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
 
 # Step 3: Define the tables
 photographers_table = dynamodb.Table('photographers')  # Table where photographer details are stored
